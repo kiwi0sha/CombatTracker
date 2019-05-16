@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/add_Encounter"
+        android:title="@string/add_encounter"
+        app:showAsAction="never"></item>
+    <item
+        android:id="@+id/del_Encounter"
+        android:title="@string/del_encounter"
+        app:showAsAction="never"></item>
+    <item
+        android:id="@+id/About"
+        android:title="@string/title_activity_about"
+        app:showAsAction="never"></item>
+
+</menu>

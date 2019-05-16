@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">Combat Tracker</string>
+    <string name="resource_name">Name</string>
+    <string name="edit_name">Enter Name Here</string>
+    <string name="edit_number">99</string>
+    <string name="HP">Health</string>
+    <string name="temp_HP">Temporary Hit Points</string>
+    <string name="add_creature">Add Creature</string>
+    <string name="add_encounter">Add Encounter</string>
+    <string name="del_encounter">Delete Encounter</string>
+    <string name="edit_creature">Edit Creature</string>
+    <string name="edit_encounter">Edit Encounter</string>
+    <string name="clear_selection">Clear Choice</string>
+    <string name="settings">Settings</string>
+    <string name="remove_creature">Remove Creature</string>
+    <string name="title_activity_about">About</string>
+    <string name="title_activity_manage_creature">Manage Creatures</string>
+    <string name="title_activity_manage_encounter">Manage Encounter</string>
+    <string name="about_dance">Dancing Tauren</string>
+    <string name="save_btn">Save Changes</string>
+    <string name="cancel_btn">Cancel</string>
+    <string name="del_btn">Delete</string>
+    <string name="del_dialog">Are you sure you want to delete %s?</string>
+    <string name="emp_list_dialog">There is no entries for %s</string>
+    <string name="edit_creature_og_title">Original Creature:</string>
+    <string name="man_creature_btn">Manage Creatures</string>
+    <string name="man_encounter_btn">Manage Encounters</string>
+    <string name="man_player_btn">Manage players</string>
+    <string name="man_party_btn">Manage partys</string>
+    <string name="about_blurb">this app was made by Shaun Galyer for a tertiary paper\nA link to the source code to be added here along with anything else i feel like saying</string>
+</resources>
