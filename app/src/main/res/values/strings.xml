@@ -27,6 +27,5 @@
     <string name="man_encounter_btn">Manage Encounters</string>
     <string name="man_player_btn">Manage players</string>
     <string name="man_party_btn">Manage partys</string>
-    <string name="about_blurb">this app was made by Shaun Galyer for a tertiary paper\nA link to the source code to be added here along with anything else i feel like saying</string>
-    <string name="link_to_git">https://github.com/kiwi0sha/CombatTracker</string>
+    <string name="about_blurb">this app was made by Shaun Galyer for a tertiary paper\nA link to the source code to be added <a herf="https://github.com/kiwi0sha/CombatTracker">here</a> along with anything else i feel like saying</string>
 </resources>

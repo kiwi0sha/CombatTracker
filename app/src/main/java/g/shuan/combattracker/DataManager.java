@@ -234,14 +234,17 @@ public class DataManager extends SQLiteOpenHelper {
         ContentValues cv = new ContentValues();
         cv.put(ENCOUNTER_COL[0],DATE_FORMAT.format(enc.getDate()));
         long pk = db.insert(ENCOUNTER_TABLE,null,cv);
+        Log.d("SQL", "newEncounter: new encounter pk ="+pk);
         cv.remove(ENCOUNTER_COL[0]);
         cv.put(ENCOUNTER_COMP_COL[0],pk);
         for (int i =0;i<enc.getCreatureList().size();i++){
             cv.put(ENCOUNTER_COMP_COL[1],enc.getCreatureList().get(i).getPk());
             db.insert(ENCOUNTER_COMP_TABLE,null,cv);
+            Log.d("SQL", "newEncounter: db insert "+enc.getCreatureList().get(i).toString());
+            Log.d("Content Values", "newEncounter: "+cv.toString());
             cv.remove(ENCOUNTER_COMP_COL[1]);
         }
-            return pk;
+        return pk;
     }
 
     public boolean updateEncounter(Encounter enc){

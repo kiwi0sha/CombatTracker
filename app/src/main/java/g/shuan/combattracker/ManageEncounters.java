@@ -100,9 +100,11 @@ public class ManageEncounters extends AppCompatActivity {
                 startActivity(intent);
                 break;
             case R.id.del_Encounter:
-                db.delEncounter(tar);
-                clrSelection(null);
-                refreshList();
+                if(tar != null) {
+                    db.delEncounter(tar);
+                    clrSelection(null);
+                    refreshList();
+                }
                 break;
         }
         return super.onOptionsItemSelected(item);
