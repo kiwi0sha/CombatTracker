@@ -42,8 +42,6 @@ public class DataManager extends SQLiteOpenHelper {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 
-    private SQLiteDatabase db = getWritableDatabase();//shortens most method creation and writing by doing this here
-
 
     public DataManager(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VER);
@@ -138,51 +136,63 @@ public class DataManager extends SQLiteOpenHelper {
 
     //creates new Creature entry and returns its PK, or returns -1 if it fails
     public long newCreature(Creature mob){
+        SQLiteDatabase db = getWritableDatabase();
         String insert = "INSERT INTO "+CREATURE_TABLE+"( "+CREATURE_COL[0]+", "+CREATURE_COL[1]+") VALUES ('"+mob.getCreatureName()+"', '"+mob.getMaxHP()+"' );";
         Cursor res = db.rawQuery(insert,null);
-        if(res.moveToFirst())
-            return res.getLong(0);
+        if(res.moveToFirst()){
+            db.close();
+            return res.getLong(0);}
+        db.close();
         return -1;
     }
 
     //update Creature table, player can be null
     public boolean editCreature(Creature mob, @Nullable String playerName){
+        SQLiteDatabase db = getWritableDatabase();
         Cursor cur = db.rawQuery("SELECT "+PK+" FROM "+ENCOUNTER_COMP_TABLE+" WHERE `"+ENCOUNTER_COMP_COL[1] +"` = "+mob.getPk(),null);
         if(cur.getCount() == 0) {
             if (playerName == null) {
                 db.execSQL("UPDATE `" + CREATURE_TABLE + "` SET `" + CREATURE_COL[0] + "` = \"" + mob.getCreatureName() + "\",`"
                         + CREATURE_COL[1] + "` = \"" + mob.getMaxHP() + "\" WHERE `" + PK + "` = \"" + mob.getPk() + "\";");
+                db.close();
                 return true;
             }
             else {
                 //do stuff
             }
         }
+        db.close();
         return false;
     }
 
     //delete Creature from database if it is not used else where
     public boolean delCreature(Creature mob){
+        SQLiteDatabase db = getWritableDatabase();
         Cursor cur = db.rawQuery("SELECT "+PK+" FROM "+ENCOUNTER_COMP_TABLE+" WHERE `"+ENCOUNTER_COMP_COL[1] +"` = "+mob.getPk(),null);
         if(cur.getCount() == 0) {
             db.execSQL("DELETE FROM `" + CREATURE_TABLE + "` WHERE `" + PK + "` IN ('" + mob.getPk() + "');");
         }
+        db.close();
         return false;
     }
 
     //get Creature row from a given id, returns null if fails
     public Creature getCreature(long id){
+        SQLiteDatabase db = getWritableDatabase();
         String select = "SELECT * FROM "+CREATURE_TABLE+" WHERE "+PK+" = '"+ id+"'";
         Cursor res = db.rawQuery(select,null);
-        if(res.moveToFirst())
-            return new Creature(res.getString(0),res.getInt(1), id);
+        if(res.moveToFirst()){
+            db.close();
+            return new Creature(res.getString(0),res.getInt(1), id);}
         else
+            db.close();
             return null;
     }
 
 
     //gets all creatures from database as a arraylist
     public ArrayList<Creature> getAllCreatures(){
+        SQLiteDatabase db = getWritableDatabase();
         ArrayList<Creature> ret = new ArrayList<Creature>();
         if(db.rawQuery("SELECT * FROM `"+CREATURE_TABLE+"`",null).getCount()>0) {
             String select = "SELECT `" + PK + "`, * FROM `" + CREATURE_TABLE + "` ORDER BY `" + CREATURE_COL[0] + "`;";
@@ -191,10 +201,12 @@ public class DataManager extends SQLiteOpenHelper {
                 ret.add(new Creature(res.getString(1), res.getInt(2), res.getLong(0)));
             }
         }
+        db.close();
         return ret;
     }
 
     public Encounter getEncounter(long ID){//SELECT `creatureID` FROM `encounterComp` WHERE `encounterID` = 1;
+        SQLiteDatabase db = getWritableDatabase();
         Cursor out = db.rawQuery("SELECT `" + PK + "`,`"+ENCOUNTER_COL[0]+"` FROM `" + ENCOUNTER_TABLE + "` WHERE `"+PK+"` = "+ID+";", null);
         out.moveToFirst();
         Cursor in = db.rawQuery("SELECT `"+ENCOUNTER_COMP_COL[1]+"` FROM `"+ENCOUNTER_COMP_TABLE+"` WHERE `"+ENCOUNTER_COMP_COL[1]+"` = "+ID+";", null);
@@ -216,10 +228,12 @@ public class DataManager extends SQLiteOpenHelper {
                     e.printStackTrace();
                 }
             }
+        db.close();
             return null;
     }
 
     public ArrayList<Encounter> getAllEncounters(){
+        SQLiteDatabase db = getWritableDatabase();
         Cursor out = db.rawQuery("SELECT `" + PK + "` FROM `" + ENCOUNTER_TABLE + "` ORDER BY `" + ENCOUNTER_COL[0] + "`;", null);
         ArrayList<Encounter> ret = new ArrayList<Encounter>();
         if(out.getCount() > 0){
@@ -227,10 +241,12 @@ public class DataManager extends SQLiteOpenHelper {
                 ret.add( getEncounter(out.getLong(0)));
             }
         }
+        db.close();
         return ret;
     }
     //creates new Encounter entry and returns its PK, or returns -1 if it fails
     public long newEncounter(Encounter enc){
+        SQLiteDatabase db = getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(ENCOUNTER_COL[0],DATE_FORMAT.format(enc.getDate()));
         long pk = db.insert(ENCOUNTER_TABLE,null,cv);
@@ -238,16 +254,16 @@ public class DataManager extends SQLiteOpenHelper {
         cv.remove(ENCOUNTER_COL[0]);
         cv.put(ENCOUNTER_COMP_COL[0],pk);
         for (int i =0;i<enc.getCreatureList().size();i++){
-            cv.put(ENCOUNTER_COMP_COL[1],enc.getCreatureList().get(i).getPk());
-            db.insert(ENCOUNTER_COMP_TABLE,null,cv);
-            Log.d("SQL", "newEncounter: db insert "+enc.getCreatureList().get(i).toString());
-            Log.d("Content Values", "newEncounter: "+cv.toString());
-            cv.remove(ENCOUNTER_COMP_COL[1]);
+            String insert = "INSERT INTO `"+ENCOUNTER_COMP_TABLE+"`(`"+ENCOUNTER_COMP_COL[0]+"`,`"+ENCOUNTER_COMP_COL[1]+"` ) VALUES ('"+pk+"', "+enc.getCreatureList().get(i).getPk()+");";
+            db.execSQL(insert);
+            Log.d("SQL", "newEncounter: "+insert);
         }
+        db.close();
         return pk;
     }
 
     public boolean updateEncounter(Encounter enc){
+        SQLiteDatabase db = getWritableDatabase();
         Cursor cur = db.rawQuery("SELECT "+PK+" FROM "+COMBAT_TABLE+" WHERE `"+COMBAT_COL[2] +"` = "+enc.getPk(),null);
         if(cur.getCount() == 0) {
             long pk = enc.getPk();
@@ -255,22 +271,27 @@ public class DataManager extends SQLiteOpenHelper {
             cv.put(ENCOUNTER_COMP_COL[0], pk);
             db.delete(ENCOUNTER_COMP_TABLE, ENCOUNTER_COMP_COL[0] + " = (" + pk + ")", null);
             for (int i = 0; i < enc.getCreatureList().size(); i++) {
-                cv.put(ENCOUNTER_COMP_COL[1], enc.getCreatureList().get(i).getPk());
-                db.insert(ENCOUNTER_COMP_TABLE, null, cv);
-                cv.remove(ENCOUNTER_COMP_COL[1]);
+                String insert = "INSERT INTO `"+ENCOUNTER_COMP_TABLE+"`(`"+ENCOUNTER_COMP_COL[0]+"`,`"+ENCOUNTER_COMP_COL[1]+"` ) VALUES ('"+pk+"', "+enc.getCreatureList().get(i).getPk()+");";
+                db.execSQL(insert);
+                Log.d("SQL", "updateEncounter: "+insert);
             }
+            db.close();
             return true;
         }
+        db.close();
         return false;
     }
 
     public boolean delEncounter(Encounter enc){
+        SQLiteDatabase db = getWritableDatabase();
         Cursor cur = db.rawQuery("SELECT "+PK+" FROM "+COMBAT_TABLE+" WHERE `"+COMBAT_COL[2] +"` = "+enc.getPk(),null);
         if(cur.getCount() == 0){
             db.delete(ENCOUNTER_COMP_TABLE,ENCOUNTER_COMP_COL[0]+" = ("+enc.getPk()+")",null);
             db.delete(ENCOUNTER_TABLE,"`"+PK+"` = "+enc.getPk(),null);
+            db.close();
             return true;
         }
+        db.close();
         return false;
     }
 }
