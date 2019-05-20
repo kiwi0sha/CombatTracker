@@ -205,11 +205,11 @@ public class DataManager extends SQLiteOpenHelper {
         return ret;
     }
 
-    public Encounter getEncounter(long ID){//SELECT `creatureID` FROM `encounterComp` WHERE `encounterID` = 1;
+    public Encounter getEncounter(long ID){//SELECT `creatureID` FROM `encounterComp` WHERE `encounterID` = 1;{"encounterID","creatureID"};
         SQLiteDatabase db = getWritableDatabase();
         Cursor out = db.rawQuery("SELECT `" + PK + "`,`"+ENCOUNTER_COL[0]+"` FROM `" + ENCOUNTER_TABLE + "` WHERE `"+PK+"` = "+ID+";", null);
         out.moveToFirst();
-        Cursor in = db.rawQuery("SELECT `"+ENCOUNTER_COMP_COL[1]+"` FROM `"+ENCOUNTER_COMP_TABLE+"` WHERE `"+ENCOUNTER_COMP_COL[1]+"` = "+ID+";", null);
+        Cursor in = db.rawQuery("SELECT `"+ENCOUNTER_COMP_COL[1]+"` FROM `"+ENCOUNTER_COMP_TABLE+"` WHERE `"+ENCOUNTER_COMP_COL[0]+"` = "+ID+";", null);
         ArrayList<Creature> res = new ArrayList<>();
         while(in.moveToNext()){
                 res.add(getCreature(in.getLong(0)));

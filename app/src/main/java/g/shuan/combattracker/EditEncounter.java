@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -122,10 +123,12 @@ public class EditEncounter extends AppCompatActivity {
     }
 
     private void save(){
-        if(editTar == null)
-            db.newEncounter(new Encounter(Calendar.getInstance().getTime(),-1,alEnc));
+        if(editTar == null){
+            Log.d("SQL", "save: new encounter");
+            db.newEncounter(new Encounter(Calendar.getInstance().getTime(),-1,alEnc));}
         else {
             editTar.setCreatureList(alEnc);
+            Log.d("SQL", "save: update encounter to: "+editTar.toString());
             db.updateEncounter(editTar);
         }
         finish();
