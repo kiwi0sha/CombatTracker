@@ -14,19 +14,17 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class EditEncounter extends AppCompatActivity {
+public class EditParty extends AppCompatActivity {
     private DataManager db;
     private ListView lvAll,lvEnc;
-    private ArrayList<Creature> alAll,alEnc;
-    private Encounter editTar;
-    private Creature addTar, rmvTar;
+    private ArrayList<Encounter> alAll, alPrt;
+    private Encounter addTar, rmvTar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_encounter);
         db = new DataManager(this);
-        editTar = (Encounter) getIntent().getSerializableExtra("Encounter");
         lvAll = findViewById(R.id.allEncounters);
         lvEnc = findViewById(R.id.encCreatures);
         lvAll.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -44,23 +42,20 @@ public class EditEncounter extends AppCompatActivity {
 
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 findViewById(R.id.rmvCreatureToEncBtn).setEnabled(true);
-                rmvTar = alEnc.get(position);
+                rmvTar = alPrt.get(position);
                 for(int i = 0; i < parent.getChildCount(); i++){//clears previous highlighting
                     parent.getChildAt(i).setBackgroundColor(Color.TRANSPARENT);
                 }
                 parent.getChildAt(position).setBackgroundColor(Color.BLUE);//highlights currently selected Creature
             }
         });
-        if(editTar == null)
-            alEnc = new ArrayList<>();
-        else
-            alEnc = editTar.getCreatureList();
+        alPrt = new ArrayList<>();
         refreshList();
 
     }
 
     public void refreshList(){
-        alAll = db.getAllCreatures();
+        alAll = db.getAllEncounters();
 
         if(alAll.size() > 0){
             lvAll.setAdapter(new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,alAll));
@@ -68,8 +63,8 @@ public class EditEncounter extends AppCompatActivity {
         else{
             lvAll.setVisibility(View.INVISIBLE);
         }
-        if(alEnc.size() > 0){
-            lvEnc.setAdapter(new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,alEnc));
+        if(alPrt.size() > 0){
+            lvEnc.setAdapter(new ArrayAdapter<>(this,android.R.layout.simple_list_item_1, alPrt));
             lvEnc.setVisibility(View.VISIBLE);}
         else{
             lvEnc.setVisibility(View.INVISIBLE);
@@ -77,12 +72,12 @@ public class EditEncounter extends AppCompatActivity {
     }
 
     public void addCreature(View view){
-        alEnc.add(addTar);
+        alPrt.add(addTar);
         refreshList();
     }
 
     public void rmvCreature(View view){
-        alEnc.remove(rmvTar);
+        alPrt.remove(rmvTar);
         refreshList();
     }
 
@@ -108,7 +103,6 @@ public class EditEncounter extends AppCompatActivity {
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
                         //Yes button clicked;
-                        save();
                         break;
 
                     case DialogInterface.BUTTON_NEGATIVE:
@@ -120,17 +114,5 @@ public class EditEncounter extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Save Changes?").setPositiveButton("Yes", dialogClickListener)
                 .setNegativeButton("No", dialogClickListener).show();
-    }
-
-    private void save(){
-        if(editTar == null){
-            Log.d("SQL", "save: new encounter");
-            db.newEncounter(new Encounter(Calendar.getInstance().getTime(),-1,alEnc));}
-        else {
-            editTar.setCreatureList(alEnc);
-            Log.d("SQL", "save: update encounter to: "+editTar.toString());
-            db.updateEncounter(editTar);
-        }
-        finish();
     }
 }
