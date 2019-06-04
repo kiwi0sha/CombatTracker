@@ -26,10 +26,10 @@ public class EditParty extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_encounter);
+        setContentView(R.layout.activity_party_selection);
         db = new DataManager(this);
-        lvAll = findViewById(R.id.allEncounters);
-        lvEnc = findViewById(R.id.encCreatures);
+        lvAll = findViewById(R.id.encCreatures);
+        lvEnc = findViewById(R.id.allEncounters);
         lvAll.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -99,6 +99,7 @@ public class EditParty extends AppCompatActivity {
     }
 
     public void startCombat(View view){
+       final String TAG = "SRG";
         ArrayList<String> creatureNames = new ArrayList<>();
         ArrayList<Character> creatureMod = new ArrayList<>();
 
@@ -119,19 +120,22 @@ public class EditParty extends AppCompatActivity {
                     creatureNames.add(part.getCreatureName());
                     creatureMod.add('A');
                 }
-                LayoutInflater li = LayoutInflater.from(this);
+                LayoutInflater li = LayoutInflater.from(EditParty.this);
                 View promptV = li.inflate(R.layout.initiative_prompt,null);
                 AlertDialog.Builder adBuilder = new AlertDialog.Builder(this);
-                adBuilder.setView(R.layout.initiative_prompt);
                 final EditText newIni = (EditText) promptV.findViewById(R.id.tarIni);
-                TextView userPrompt = promptV.findViewById(R.id.iniPrmpt);
-                userPrompt.setText(getString(R.string.del_dialog).replace("%s",part.getCreatureName()));
-                adBuilder
+                final TextView userPrompt = (TextView) promptV.findViewById(R.id.iniPrmpt);
+                userPrompt.setText(getString(R.string.initiative_prmpt).replace("%s",part.getCreatureName()));
+                Log.d(TAG, "startCombat: "+getString(R.string.initiative_prmpt).replace("%s",part.getCreatureName()));
+                adBuilder.setView(R.layout.initiative_prompt);
+                AlertDialog.Builder builder = adBuilder
                         .setCancelable(false)
                         .setPositiveButton(R.string.con_btn, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                if(newIni.getText().toString() != "")
+                                Log.d(TAG, "onClick: positive branch");
+                                Log.d(TAG, "onClick: "+newIni.getText().toString());
+                                if (newIni.getText() != null)
                                     part.setInitiative(Integer.parseInt(newIni.getText().toString()));
                                 else
                                     part.setInitiative(0);
@@ -143,7 +147,8 @@ public class EditParty extends AppCompatActivity {
                                 dialogInterface.cancel();
                             }
                         });
-                adBuilder.create().show();
+                AlertDialog ad = adBuilder.create();
+                ad.show();
             }
             }
     }
