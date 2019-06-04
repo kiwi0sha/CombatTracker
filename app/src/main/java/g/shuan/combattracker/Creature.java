@@ -80,6 +80,10 @@ public class Creature implements Serializable {
 
     @Override//allows it to be written onto the list view
     public String toString() {
-        return ""+this.creatureName+"\nMax HP: "+this.getMaxHP();
+        String ret = ""+this.creatureName+"\nMax HP: "+this.getMaxHP()+"\n";
+        if(initiative > 0 )
+            return ret +"ini: " + getInitiative() + "\n";
+        else
+            return ret;
     }
 }

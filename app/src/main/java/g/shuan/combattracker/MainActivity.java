@@ -21,6 +21,10 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this,ManageEncounters.class);
         startActivity(intent);
     }
+    public void newCombat(View view){
+        Intent intent = new Intent(this,EditParty.class);
+        startActivity(intent);
+    }
     public void aboutView(View view){
         Intent intent = new Intent(this,About.class);
         startActivity(intent);

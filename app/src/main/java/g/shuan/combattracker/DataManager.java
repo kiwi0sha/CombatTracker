@@ -27,13 +27,13 @@ public class DataManager extends SQLiteOpenHelper {
     private static final String STATUS_TABLE = "status";
     private static final String[] STATUS_COL = {"name"};
     private static final String COMBAT_TABLE = "combat";
-    private static final String[] COMBAT_COL = {"date","party","encounter"};
+    private static final String[] COMBAT_COL = {"date"};
     private static final String TURN_TABLE = "combatTurn";
     private static final String[] TURN_COL = {"combatID","owner","effecting","condition","amount"};
-    private static final String PARTY_TABLE = "party";
-    private static final String[] PARTY_COL = {"dateFormed"};
-    private static final String PARTY_COMP_TABLE = "partyComp";
-    private static final String[] PARTY_COMP_COL = {"partyID","playerID","creatureID"};
+    private static final String COMBAT_PART_TABLE = "comPart";
+    private static final String[] COMBAT_PART_COL = {"dateFormed"};
+    private static final String COMBAT_PART_COMP_TABLE = "comPartComp";
+    private static final String[] COMBAT_PART_COMP_COL = {"comPartID","grpNumber","creatureName","creatureMaxHP","initiative"};
     private static final String ENCOUNTER_TABLE = "encounter";
     private static final String[] ENCOUNTER_COL = {"dateFormed"};
     private static final String ENCOUNTER_COMP_TABLE = "encounterComp";
@@ -58,15 +58,15 @@ public class DataManager extends SQLiteOpenHelper {
         //create player table
         sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS `"+PLAYER_TABLE+"` (`"+PLAYER_COL[0]+"`	TEXT NOT NULL);");
         //create partyComp table
-        sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS `"+PARTY_COMP_TABLE+"` (" +
-                "`"+PARTY_COMP_COL[0]+"`	INTEGER NOT NULL, " +
-                "`"+PARTY_COMP_COL[1]+"`	INTEGER NOT NULL, " +
-                "`"+PARTY_COMP_COL[2]+"`	INTEGER NOT NULL);");
+        sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS `"+ COMBAT_PART_COMP_TABLE +"` (" +
+                "`"+ COMBAT_PART_COMP_COL[0]+"`	INTEGER NOT NULL, " +
+                "`"+ COMBAT_PART_COMP_COL[1]+"`	INTEGER NOT NULL, " +
+                "`"+ COMBAT_PART_COMP_COL[2]+"`	TEXT NOT NULL, " +
+                "`"+ COMBAT_PART_COMP_COL[3]+"`	INTEGER NOT NULL, " +
+                "`"+ COMBAT_PART_COMP_COL[4]+"`	INTEGER NOT NULL);");
         //create combat table
         sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS `"+COMBAT_TABLE+"` (" +
-                "`"+COMBAT_COL[0]+"`	INTEGER NOT NULL, " +
-                "`"+COMBAT_COL[1]+"`	INTEGER NOT NULL, " +
-                "`"+COMBAT_COL[2]+"`	INTEGER NOT NULL);");
+                "`"+COMBAT_COL[0]+"`	INTEGER NOT NULL);");
         //create status table
         sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS `"+STATUS_TABLE+"` (`"+STATUS_COL[0]+"` TEXT NOT NULL);");
         //create encounter table
@@ -76,7 +76,7 @@ public class DataManager extends SQLiteOpenHelper {
                 "`"+ ENCOUNTER_COMP_COL[0]+"`	INTEGER NOT NULL, " +
                 "`"+ ENCOUNTER_COMP_COL[1]+"`	INTEGER NOT NULL);");
         //create party table
-        sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS `"+PARTY_TABLE+"` (`"+PARTY_COL[0]+"` INTEGER NOT NULL);");
+        sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS `"+ COMBAT_PART_TABLE +"` (`"+ COMBAT_PART_COL[0]+"` INTEGER NOT NULL);");
         //create turn table "combatID","owner","effecting","condition","amount"
         sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS `"+TURN_TABLE+"` " +
                 "(`"+TURN_COL[0]+"`	INTEGER NOT NULL, " +
@@ -98,9 +98,11 @@ public class DataManager extends SQLiteOpenHelper {
         //populate status table if it is empty
         res = sqLiteDatabase.rawQuery("SELECT * FROM `"+STATUS_TABLE+"`",null);
         if(!(res.getCount() > 0)){
+            sqLiteDatabase.execSQL("INSERT INTO `"+STATUS_TABLE+"`(`"+STATUS_COL[0]+"`) VALUES ('Attacked');");
             sqLiteDatabase.execSQL("INSERT INTO `"+STATUS_TABLE+"`(`"+STATUS_COL[0]+"`) VALUES ('Blinded');");
             sqLiteDatabase.execSQL("INSERT INTO `"+STATUS_TABLE+"`(`"+STATUS_COL[0]+"`) VALUES ('Charmed');");
             sqLiteDatabase.execSQL("INSERT INTO `"+STATUS_TABLE+"`(`"+STATUS_COL[0]+"`) VALUES ('Deafened');");
+            sqLiteDatabase.execSQL("INSERT INTO `"+STATUS_TABLE+"`(`"+STATUS_COL[0]+"`) VALUES ('End Turn');");
             sqLiteDatabase.execSQL("INSERT INTO `"+STATUS_TABLE+"`(`"+STATUS_COL[0]+"`) VALUES ('Fatigued');");
             sqLiteDatabase.execSQL("INSERT INTO `"+STATUS_TABLE+"`(`"+STATUS_COL[0]+"`) VALUES ('Frightened');");
             sqLiteDatabase.execSQL("INSERT INTO `"+STATUS_TABLE+"`(`"+STATUS_COL[0]+"`) VALUES ('Grappled');");
@@ -123,8 +125,8 @@ public class DataManager extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {//purge and recreate database
         //nuke and pave
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+TURN_TABLE+";");
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+PARTY_COMP_TABLE+";");
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+PARTY_TABLE+";");
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ COMBAT_PART_COMP_TABLE +";");
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ COMBAT_PART_TABLE +";");
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ENCOUNTER_COMP_TABLE+";");
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ENCOUNTER_TABLE+";");
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+STATUS_TABLE+";");
@@ -292,6 +294,33 @@ public class DataManager extends SQLiteOpenHelper {
             return true;
         }
         db.close();
+        return false;
+    }
+
+
+    //COMBAT_PART_TABLE = "comPart";
+    //COMBAT_PART_COL = {"dateFormed"};
+    //COMBAT_PART_COMP_TABLE = "comPartComp";
+    //COMBAT_PART_COMP_COL = {"comPartID","grpNumber","creatureName","creatureMaxHP","initiative"};
+
+    public boolean newCombat(ArrayList<Encounter> participents){
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(COMBAT_PART_COL[0],DATE_FORMAT.format(new Date()));
+        long pk = db.insert(ENCOUNTER_TABLE,null,cv);
+        Log.d("SQL", "newCombat: new combat participant list pk ="+pk);
+        cv.remove(COMBAT_PART_COL[0]);
+        cv.put(COMBAT_PART_COMP_COL[0],pk);
+        for(int i = 0; i < participents.size();i++){
+            cv.put(COMBAT_PART_COMP_COL[1],i);
+            for (Creature part : participents.get(i).getCreatureList()) {
+                cv.put(COMBAT_PART_COMP_COL[2],part.getCreatureName());
+                cv.put(COMBAT_PART_COMP_COL[3],part.getMaxHP());
+                cv.put(COMBAT_PART_COMP_COL[4],part.getInitiative());
+                db.insert(COMBAT_PART_COMP_TABLE,null,cv);
+            }
+        }
+
         return false;
     }
 }

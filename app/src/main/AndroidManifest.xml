@@ -30,6 +30,7 @@
             android:label="@string/title_activity_manage_encounter"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity android:name=".EditEncounter" />
+        <activity android:name=".EditParty" />
     </application>
 
 </manifest>

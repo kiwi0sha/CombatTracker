@@ -25,7 +25,12 @@
     <string name="edit_creature_og_title">Original Creature:</string>
     <string name="man_creature_btn">Manage Creatures</string>
     <string name="man_encounter_btn">Manage Encounters</string>
-    <string name="man_player_btn">Manage players</string>
-    <string name="man_party_btn">Manage partys</string>
+    <string name="start_new_combat_btn">New combat</string>
+    <string name="continue_combat_btn">Continue combat</string>
+    <string name="add_to_combat_btn">Add to combat</string>
+    <string name="remove_from_combat_btn">Remove from combat</string>
+    <string name="start_combat_btn">Commence combat</string>
+    <string name="con_btn">Continue</string>
+    <string name="initiative_prmpt">Enter Intitiative for %s:</string>
     <string name="about_blurb">this app was made by Shaun Galyer for a tertiary paper\nA link to the source code to be added <a herf="https://github.com/kiwi0sha/CombatTracker">here</a> along with anything else i feel like saying</string>
 </resources>

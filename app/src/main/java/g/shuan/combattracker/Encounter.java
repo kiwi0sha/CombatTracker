@@ -49,9 +49,9 @@ public class Encounter implements Serializable {
     public String toString() {
         String ret = "formed: " + DATE_FORMAT.format(date);
         if(creatureList.size() > 0) {
-            ret = ret + "\nContains: ";
+            ret = ret + "\nContains:\n";
             for (Creature creature : creatureList) {
-                ret += creature.toString() + ", ";
+                ret += creature.toString();
             }
         }
         else
