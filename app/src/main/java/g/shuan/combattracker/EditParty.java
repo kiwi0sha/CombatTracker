@@ -102,43 +102,28 @@ public class EditParty extends AppCompatActivity {
        final String TAG = "SRG";
         ArrayList<String> creatureNames = new ArrayList<>();
         ArrayList<Character> creatureMod = new ArrayList<>();
+        boolean allIni = true;
 
-        for(int i = 0; i < alPrt.size();i++){
-            for (final Creature part : alPrt.get(i).getCreatureList()) {
-                Boolean newName = true;
-                for(int j = 0;j< creatureNames.size();j++){
-                    if(part.getCreatureName().equals(creatureNames.get(j))){ //modify name if it already exsists to be unique
-                        part.setCreatureName(part.getCreatureName()+" "+creatureMod.get(j));
-                        char temp = creatureMod.get(j);
-                        temp +=1;
-                        creatureMod.set(j,temp);
-                        newName = false;
-                        break;
-                    }
-                }
-                if(newName){
-                    creatureNames.add(part.getCreatureName());
-                    creatureMod.add('A');
-                }
+        for(int i = 0; i < alPrt.size();i++)
+            for( final Creature part : alPrt.get(i).getCreatureList()) {
                 LayoutInflater li = LayoutInflater.from(EditParty.this);
-                View promptV = li.inflate(R.layout.initiative_prompt,null);
+                View promptV = li.inflate(R.layout.initiative_prompt, null);
                 AlertDialog.Builder adBuilder = new AlertDialog.Builder(this);
                 final EditText newIni = (EditText) promptV.findViewById(R.id.tarIni);
                 final TextView userPrompt = (TextView) promptV.findViewById(R.id.iniPrmpt);
-                userPrompt.setText(getString(R.string.initiative_prmpt).replace("%s",part.getCreatureName()));
-                Log.d(TAG, "startCombat: "+getString(R.string.initiative_prmpt).replace("%s",part.getCreatureName()));
+                userPrompt.setText(getString(R.string.initiative_prmpt).replace("%s", part.getCreatureName()));
+                Log.d(TAG, "startCombat: " + getString(R.string.initiative_prmpt).replace("%s", part.getCreatureName()));
                 adBuilder.setView(promptV);
-                AlertDialog.Builder builder = adBuilder
+                adBuilder
                         .setCancelable(false)
                         .setPositiveButton(R.string.con_btn, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                Log.d(TAG, "onClick: positive branch");
-                                Log.d(TAG, "onClick: "+newIni.getText().toString());
                                 if (newIni.getText() != null)
                                     part.setInitiative(Integer.parseInt(newIni.getText().toString()));
                                 else
                                     part.setInitiative(0);
+                                Log.d(TAG, part.getCreatureName() + " ini = " + part.getInitiative());
                             }
                         })
                         .setNegativeButton(R.string.cancel_btn, new DialogInterface.OnClickListener() {
@@ -148,10 +133,32 @@ public class EditParty extends AppCompatActivity {
                             }
                         });
                 AlertDialog ad = adBuilder.create();
-                ad.show();
-                Log.d(TAG, "startCombat: "+part.toString());
+                if (part.getInitiative() == 0) {
+                    ad.show();
+                    allIni = false;
+                }
+                Log.d(TAG, "startCombat: " + part.toString());
             }
-            }
-        refreshList();
-    }
+
+        if(allIni){
+            for(int i = 0; i < alPrt.size();i++)
+                for (Creature part : alPrt.get(i).getCreatureList()) {
+                    Boolean newName = true;
+                    for (int j = 0; j < creatureNames.size(); j++) {
+                        if (part.getCreatureName().equals(creatureNames.get(j))) { //modify name if it already exsists to be unique
+                            part.setCreatureName(part.getCreatureName() + " " + creatureMod.get(j));
+                            char temp = creatureMod.get(j);
+                            temp += 1;
+                            creatureMod.set(j, temp);
+                            newName = false;
+                            break;
+                        }
+                    }
+                    if (newName) {
+                        creatureNames.add(part.getCreatureName());
+                        creatureMod.add('A');
+                    }
+                }
+            //start combat :)
+        }}
 }
