@@ -24,6 +24,15 @@ public class Encounter implements Serializable {
         this.creatureList = creatureList;
     }
 
+    public Encounter clone(){
+        try {
+            return (Encounter) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+            return new Encounter(this.date,this.pk,this.creatureList);
+        }
+    }
+
     public Date getDate() {
         return date;
     }
@@ -59,4 +68,5 @@ public class Encounter implements Serializable {
         return ret;
 
     }
+
 }

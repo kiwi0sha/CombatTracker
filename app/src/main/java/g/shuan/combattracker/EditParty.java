@@ -75,7 +75,7 @@ public class EditParty extends AppCompatActivity {
     }
 
     public void addCreature(View view){
-        alPrt.add(addTar);
+        alPrt.add(addTar.clone());
         refreshList();
     }
 
@@ -127,7 +127,7 @@ public class EditParty extends AppCompatActivity {
                 final TextView userPrompt = (TextView) promptV.findViewById(R.id.iniPrmpt);
                 userPrompt.setText(getString(R.string.initiative_prmpt).replace("%s",part.getCreatureName()));
                 Log.d(TAG, "startCombat: "+getString(R.string.initiative_prmpt).replace("%s",part.getCreatureName()));
-                adBuilder.setView(R.layout.initiative_prompt);
+                adBuilder.setView(promptV);
                 AlertDialog.Builder builder = adBuilder
                         .setCancelable(false)
                         .setPositiveButton(R.string.con_btn, new DialogInterface.OnClickListener() {
@@ -149,7 +149,9 @@ public class EditParty extends AppCompatActivity {
                         });
                 AlertDialog ad = adBuilder.create();
                 ad.show();
+                Log.d(TAG, "startCombat: "+part.toString());
             }
             }
+        refreshList();
     }
 }

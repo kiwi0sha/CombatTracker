@@ -26,6 +26,15 @@ public class Creature implements Serializable {
         condition = new ArrayList <String>();
     }
 
+    public Creature clone(){
+        try {
+            return (Creature) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+            return new Creature(this.creatureName,this.maxHP,this.pk);
+        }
+    }
+
     public String getCreatureName() {
         return creatureName;
     }

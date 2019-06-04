@@ -77,7 +77,7 @@ public class EditEncounter extends AppCompatActivity {
     }
 
     public void addCreature(View view){
-        alEnc.add(addTar);
+        alEnc.add(addTar.clone());
         refreshList();
     }
 
