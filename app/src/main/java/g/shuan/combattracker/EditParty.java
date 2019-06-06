@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -106,6 +107,22 @@ public class EditParty extends AppCompatActivity {
 
         for(int i = 0; i < alPrt.size();i++)
             for( final Creature part : alPrt.get(i).getCreatureList()) {
+            if(part.getInitiative()<1){
+                Boolean newName = true;
+                for (int j = 0; j < creatureNames.size(); j++) {
+                    if (part.getCreatureName().equals(creatureNames.get(j))) { //modify name if it already exsists to be unique
+                        part.setCreatureName(part.getCreatureName() + " " + creatureMod.get(j));
+                        char temp = creatureMod.get(j);
+                        temp += 1;
+                        creatureMod.set(j, temp);
+                        newName = false;
+                        break;
+                    }
+                }
+                if (newName) {
+                    creatureNames.add(part.getCreatureName());
+                    creatureMod.add('A');
+                }
                 LayoutInflater li = LayoutInflater.from(EditParty.this);
                 View promptV = li.inflate(R.layout.initiative_prompt, null);
                 AlertDialog.Builder adBuilder = new AlertDialog.Builder(this);
@@ -133,32 +150,12 @@ public class EditParty extends AppCompatActivity {
                             }
                         });
                 AlertDialog ad = adBuilder.create();
-                if (part.getInitiative() == 0) {
-                    ad.show();
-                    allIni = false;
-                }
+                ad.show();
+                allIni = false;
                 Log.d(TAG, "startCombat: " + part.toString());
-            }
-
+            }}
+        refreshList();
         if(allIni){
-            for(int i = 0; i < alPrt.size();i++)
-                for (Creature part : alPrt.get(i).getCreatureList()) {
-                    Boolean newName = true;
-                    for (int j = 0; j < creatureNames.size(); j++) {
-                        if (part.getCreatureName().equals(creatureNames.get(j))) { //modify name if it already exsists to be unique
-                            part.setCreatureName(part.getCreatureName() + " " + creatureMod.get(j));
-                            char temp = creatureMod.get(j);
-                            temp += 1;
-                            creatureMod.set(j, temp);
-                            newName = false;
-                            break;
-                        }
-                    }
-                    if (newName) {
-                        creatureNames.add(part.getCreatureName());
-                        creatureMod.add('A');
-                    }
-                }
-            //start combat :)
+            Toast.makeText(this,"Start combat",Toast.LENGTH_LONG).show();
         }}
 }
