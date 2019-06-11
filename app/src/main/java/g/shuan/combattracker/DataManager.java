@@ -126,6 +126,7 @@ public class DataManager extends SQLiteOpenHelper {
         //nuke and pave
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+TURN_TABLE+";");
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ COMBAT_PART_COMP_TABLE +";");
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ COMBAT_TABLE +";");
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ COMBAT_PART_TABLE +";");
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ENCOUNTER_COMP_TABLE+";");
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ENCOUNTER_TABLE+";");
@@ -173,6 +174,8 @@ public class DataManager extends SQLiteOpenHelper {
         Cursor cur = db.rawQuery("SELECT "+PK+" FROM "+ENCOUNTER_COMP_TABLE+" WHERE `"+ENCOUNTER_COMP_COL[1] +"` = "+mob.getPk(),null);
         if(cur.getCount() == 0) {
             db.execSQL("DELETE FROM `" + CREATURE_TABLE + "` WHERE `" + PK + "` IN ('" + mob.getPk() + "');");
+            db.close();
+            return true;
         }
         db.close();
         return false;
@@ -266,8 +269,6 @@ public class DataManager extends SQLiteOpenHelper {
 
     public boolean updateEncounter(Encounter enc){
         SQLiteDatabase db = getWritableDatabase();
-        Cursor cur = db.rawQuery("SELECT "+PK+" FROM "+COMBAT_TABLE+" WHERE `"+COMBAT_COL[2] +"` = "+enc.getPk(),null);
-        if(cur.getCount() == 0) {
             long pk = enc.getPk();
             ContentValues cv = new ContentValues();
             cv.put(ENCOUNTER_COMP_COL[0], pk);
@@ -279,22 +280,14 @@ public class DataManager extends SQLiteOpenHelper {
             }
             db.close();
             return true;
-        }
-        db.close();
-        return false;
     }
 
     public boolean delEncounter(Encounter enc){
         SQLiteDatabase db = getWritableDatabase();
-        Cursor cur = db.rawQuery("SELECT "+PK+" FROM "+COMBAT_TABLE+" WHERE `"+COMBAT_COL[2] +"` = "+enc.getPk(),null);
-        if(cur.getCount() == 0){
             db.delete(ENCOUNTER_COMP_TABLE,ENCOUNTER_COMP_COL[0]+" = ("+enc.getPk()+")",null);
             db.delete(ENCOUNTER_TABLE,"`"+PK+"` = "+enc.getPk(),null);
             db.close();
             return true;
-        }
-        db.close();
-        return false;
     }
 
 
